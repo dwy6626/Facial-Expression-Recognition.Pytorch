@@ -4,70 +4,27 @@ visualize results for test image
 
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import os
 from torch.utils.data import DataLoader, Dataset
-
-import transforms as transforms
+from torchvision import transforms
 from skimage import io
-from skimage.transform import resize
+
+import os
+
 from models import *
+from evaluate import ImageDataset
 
 input_dir = "inputs"
 output_dir = "outputs"
 batch_size = 200
 
 class_names = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
-color_list = ['red','orangered','darkorange','limegreen','darkgreen','royalblue','navy']
 weight_path = os.path.join('FER2013_VGG19', 'PrivateTest_model.t7')
+color_list = ['red','orangered','darkorange','limegreen','darkgreen','royalblue','navy']
 
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
-
-# -----------------
-# image pre-process
-# -----------------
-"""
-10-crop:
-
-    Crop the given PIL Image into four corners and the central crop 
-    plus the flipped version of these (horizontal flipping is used by default)
-
-https://pytorch.org/docs/stable/torchvision/transforms.html
-"""
-
-class ImageDataset(Dataset):
-    def __init__(self, image_dir):
-        data_list = []
-        for x in os.listdir(image_dir):
-            check_suffix = [x.lower().endswith(s) for s in ['.png', '.jpg', '.jpeg']]
-            data_list.append(os.path.join(image_dir, x))
-
-        self.data_list = data_list
-        self.pipeline = transforms.Compose([
-            # transforms.Grayscale(),  # not need ?
-            transforms.Resize(48),
-            transforms.TenCrop(44),
-            transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
-        ])
-        
-    def __getitem__(self, i):
-        # get file name and load
-        p = self.data_list[i]
-        x = Image.open(p)
-        x = self.pipeline(x)
-        
-        # to 3 channel
-        if x.shape[1] == 1:
-            x = torch.cat([x, x, x], dim=1)
-     
-        return p.split('/')[-1], x
-
-    def __len__(self):
-        return len(self.data_list)
 
 
 test_loader = DataLoader(

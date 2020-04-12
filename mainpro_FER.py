@@ -8,7 +8,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 import torchvision
-import transforms as transforms
+from torchvision import transforms
 import numpy as np
 import os
 import argparse
