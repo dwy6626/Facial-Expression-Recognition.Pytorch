@@ -5,8 +5,6 @@ from torchvision import transforms
 
 import os
 
-from models import *
-
 # -----------------
 # image pre-process
 # -----------------
@@ -24,7 +22,8 @@ class ImageDataset(Dataset):
         data_list = []
         for x in os.listdir(image_dir):
             check_suffix = [x.lower().endswith(s) for s in ['.png', '.jpg', '.jpeg']]
-            data_list.append(os.path.join(image_dir, x))
+            if any(check_suffix):
+                data_list.append(os.path.join(image_dir, x))
 
         self.data_list = data_list
         self.pipeline = transforms.Compose([
